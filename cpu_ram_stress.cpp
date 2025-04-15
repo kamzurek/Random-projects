@@ -88,22 +88,27 @@ void print_cpu_usage() {
     cout << "Obciążenie CPU: " << cpuUsage << "%" << endl;
 }
 
-
-
 int main() {
     setlocale(LC_ALL, "");
 
     const size_t GB = 1024ULL * 1024ULL * 1024ULL;
-    const size_t SIZE = 22ULL * GB; //Zmień tą liczbę (*22*) i dostosuj do swojego hardware np. dla 16GB RAM ustaw 12ULL aby nie dostać BlueScreena
-    cout << "Rezerwuję ok. 22 GB pamięci..." << endl;
+    const size_t BLOCK_SIZE = 1ULL * GB;
+    const size_t BLOCK_COUNT = 20; //Change this number to declare how much GB you want to use.
 
-    char* big_array = new(nothrow) char[SIZE];
-    if (!big_array) {
-        cerr << "Nie udało się zaalokować pamięci!" << endl;
-        return 1;
+    cout << "Rezerwuję ok. " << BLOCK_COUNT << " GB pamięci w blokach po 1 GB..." << endl;
+
+    vector<char*> memory_blocks;
+
+    for (size_t i = 0; i < BLOCK_COUNT; ++i) {
+        char* block = new(nothrow) char[BLOCK_SIZE];
+        if (!block) {
+            cerr << "Nie udało się zaalokować bloku #" << i << endl;
+            break;
+        }
+        memset(block, 1, BLOCK_SIZE);
+        memory_blocks.push_back(block);
     }
 
-    memset(big_array, 1, SIZE);
     unsigned int num_threads = thread::hardware_concurrency();
     vector<thread> threads;
 
@@ -129,7 +134,10 @@ int main() {
     cout << "Naciśnij Enter, aby zakończyć..." << endl;
     cin.get();
 
-    delete[] big_array;
+    for (auto ptr : memory_blocks) {
+        delete[] ptr;
+    }
+
     for (auto& t : threads) {
         t.detach();
     }
