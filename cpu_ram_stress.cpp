@@ -94,7 +94,7 @@ int main() {
     setlocale(LC_ALL, "");
 
     const size_t GB = 1024ULL * 1024ULL * 1024ULL;
-    const size_t SIZE = 22ULL * GB;
+    const size_t SIZE = 22ULL * GB; //Zmień tą liczbę (*22*) i dostosuj do swojego hardware np. dla 16GB RAM ustaw 12ULL aby nie dostać BlueScreena
     cout << "Rezerwuję ok. 22 GB pamięci..." << endl;
 
     char* big_array = new(nothrow) char[SIZE];
